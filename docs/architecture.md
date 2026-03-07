@@ -263,22 +263,18 @@ and a scale-down from 100% → 60% over the 1.2 s dying window.
 
 ---
 
-## EventBus Quirk
+## TankEvent
 
-`TankEvent` is a **flat interface** (not a discriminated union). TypeScript's
-`Extract<TankEvent, { type: K }>` therefore resolves to `never` inside
-`EventBus.on` handlers, causing type errors.
+`TankEvent` is a **discriminated union** — TypeScript's `Extract<TankEvent, { type: K }>`
+narrows correctly inside `EventBus.on` handlers, so no casts are required:
 
-**Workaround used in `InteractionHandlers.ts`:**
 ```ts
-const sub = (type: TankEvent['type'], handler: (e: TankEvent) => void) =>
-  (tank.events as any).on(type, handler);
+tank.events.on('AddFood', ({ position, count }) => { /* fully typed */ });
 ```
-The handler must manually guard with `if (event.payload.type !== ...) return;`
-before accessing payload fields.
 
-**Do not attempt to use `tank.events.on(...)` directly in handler code without
-this cast.** It will not compile.
+To add a new event type, append a variant to the `TankEvent` union in
+`src/types/entities.ts`, add a handler in `InteractionHandlers.ts`, a queue
+method in `InputSystem.ts`, and a button binding in `controls.ts`.
 
 ---
 

@@ -34,7 +34,7 @@ Debris fades out as particles.
 
 Four random disasters can strike:
 
-1. **Predator Spawn** — One or two apex predators enter from the top.
+1. **Predator Spawn** — One or two apex predators appear at a random position in the tank.
 2. **Toxic Bloom** — A chemical event reduces creature energy to 45% and spawns
    strange green food particles.
 3. **Freezing Shock** — All motion stops suddenly. Creatures recover slowly.

@@ -50,9 +50,8 @@ src/
   ui/                   ← DOM controls binding, HUD stats display
   utils/                ← Math, vec2, color, rng, spatial hash, steering
   types/                ← Shared interfaces, branded IDs, event types
-tests/                  ← Vitest unit tests (194 tests, 14 files)
+tests/                  ← Vitest unit tests (163 tests, 14 files)
 docs/                   ← Concept and ecosystem documentation
-planning/               ← Phase-by-phase engineering plans
 ```
 
 ## Scripts

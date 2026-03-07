@@ -19,7 +19,7 @@ import { vec2Add, vec2Scale } from '@/utils/vec2';
 import { createRng } from '@/utils/rng';
 import { CreatureLifeState, BodyPlan } from '@/types/entities';
 
-/** Behavior weights — tune in Phase 15 polish. */
+/** Behavior weights. */
 const W = {
   wander: 1.0,
   seekFood: 2.5,

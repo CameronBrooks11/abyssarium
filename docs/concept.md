@@ -14,7 +14,7 @@ like Shake Tank and Catastrophe inject turbulence into it.
 
 | Button | Key | Effect |
 |---|---|---|
-| Add Food | `F` | Drops food at the top of the tank |
+| Add Food | `F` | Drops food at random positions in the tank |
 | Shake Tank | `S` | Turbulence hits everything |
 | Light Pulse | `L` | Flash — some creatures hide, others glow |
 | Spawn Creature | `N` | A new species enters the tank |

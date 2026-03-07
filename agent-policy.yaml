@@ -92,10 +92,10 @@ agent_guidelines:
   - When adding a new creature body plan, add a draw function in
     src/systems/drawCreature.ts, a case in the switch, and at least one test.
   - When adding a new interaction/button, implement the full chain:
-    1. Add event type to TankEventType const
-    2. Add payload to TankEventPayload union
-    3. Add handler in InteractionHandlers.ts
-    4. Bind button in controls.ts
+    1. Add a variant to the TankEvent discriminated union in src/types/entities.ts
+    2. Add a handler in InteractionHandlers.ts
+    3. Add a queue method in InputSystem.ts
+    4. Bind the button in controls.ts
     5. Document in docs/concept.md
   - When modifying PhysicsSystem, re-run physics tests before assuming correctness.
   - When changing simulation constants (energy rates, drag, etc.), note the
