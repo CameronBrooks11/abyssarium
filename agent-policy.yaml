@@ -1,0 +1,45 @@
+# agent-policy.yaml — Abyssarium
+# Governs automated agents (Copilot, CI bots, code generators) working in
+# this repository. Updated to its final form in Phase 16.
+
+version: 1
+
+metadata:
+  project: abyssarium
+  description: >
+    A browser-based procedural aquarium simulation.
+    Canvas 2D only. No UI frameworks. No physics engines. No backend.
+
+rules:
+  - id: no-ui-framework
+    description: No React, Vue, Angular, Svelte or similar component frameworks.
+    deny: ["react", "react-dom", "vue", "@angular/core", "svelte", "solid-js", "preact"]
+    severity: error
+
+  - id: no-physics-engine
+    description: Physics must be hand-written. No external physics engines.
+    deny: ["matter-js", "cannon", "cannon-es", "rapier", "planck", "p2", "@dimforge/rapier2d"]
+    severity: error
+
+  - id: no-webgl-renderer
+    description: Rendering is Canvas 2D only. No WebGL, Three.js, PixiJS, or Babylon.
+    deny: ["three", "pixi.js", "@pixi/core", "babylonjs", "@babylonjs/core"]
+    severity: error
+
+  - id: no-dom-in-simulation
+    description: >
+      Modules in src/tank/, src/creatures/, src/particles/, src/systems/Physics.ts,
+      src/systems/BehaviorSystem.ts, and src/utils/ must not use the DOM.
+      DOM access is restricted to src/ui/, src/systems/InputSystem.ts,
+      src/systems/Renderer.ts, and src/main.ts.
+    severity: error
+
+  - id: test-required
+    description: All new modules under src/creatures/ and src/systems/ must have a test.
+    applies_to: ["src/creatures/**", "src/systems/**", "src/utils/**"]
+    requires_test: true
+    severity: warning
+
+  - id: no-global-state
+    description: No module-level mutable singletons. Use constructor injection.
+    severity: warning

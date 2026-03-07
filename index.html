@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abyssarium</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #020a10;
+      overflow: hidden;
+      font-family: 'Courier New', monospace;
+      color: #8af;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+
+    #toolbar {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(0, 10, 20, 0.90);
+      border-bottom: 1px solid rgba(100, 180, 255, 0.15);
+      z-index: 10;
+      user-select: none;
+    }
+
+    #toolbar .wordmark {
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      color: rgba(140, 200, 255, 0.85);
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    #toolbar button {
+      padding: 5px 13px;
+      background: rgba(0, 40, 80, 0.7);
+      border: 1px solid rgba(100, 180, 255, 0.30);
+      border-radius: 4px;
+      color: rgba(140, 200, 255, 0.85);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+      white-space: nowrap;
+    }
+
+    #toolbar button:hover {
+      background: rgba(0, 70, 150, 0.75);
+      border-color: rgba(100, 200, 255, 0.65);
+      color: #c8e8ff;
+    }
+
+    #toolbar button:active {
+      background: rgba(0, 100, 200, 0.75);
+      transform: scale(0.96);
+    }
+
+    #tank-container {
+      flex: 1 1 auto;
+      position: relative;
+      overflow: hidden;
+      background: #020a10;
+    }
+
+    #tank-canvas {
+      display: block;
+      /* CSS size fills the container; JS sets pixel width/height. */
+      width: 100%;
+      height: 100%;
+    }
+
+    #hud {
+      position: absolute;
+      top: 52px;
+      right: 12px;
+      font-size: 11px;
+      line-height: 1.7;
+      color: rgba(100, 180, 255, 0.45);
+      pointer-events: none;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <nav id="toolbar">
+      <span class="wordmark">ABYSSARIUM</span>
+      <button id="btn-food"        title="[F] Drop food into the tank">Add Food</button>
+      <button id="btn-shake"       title="[S] Shake the tank">Shake Tank</button>
+      <button id="btn-light"       title="[L] Emit a light pulse">Light Pulse</button>
+      <button id="btn-spawn"       title="[N] Introduce a new creature">Spawn Creature</button>
+      <button id="btn-catastrophe" title="[C] Trigger a random catastrophe">Catastrophe</button>
+    </nav>
+
+    <div id="tank-container">
+      <canvas id="tank-canvas"></canvas>
+    </div>
+
+    <div id="hud" aria-hidden="true">
+      <div id="hud-creatures">creatures: 0</div>
+      <div id="hud-particles">particles: 0</div>
+      <div id="hud-fps">fps: --</div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
