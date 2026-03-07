@@ -8,8 +8,8 @@
     "build":   "tsc && vite build",
     "preview": "vite preview",
     "test":    "vitest run",
-    "format":  "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
-    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\""
+    "format":  "prettier --write --no-error-on-unmatched-pattern \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format:check": "prettier --check --no-error-on-unmatched-pattern \"src/**/*.ts\" \"tests/**/*.ts\""
   },
   "devDependencies": {
     "typescript": "^5.4.0",

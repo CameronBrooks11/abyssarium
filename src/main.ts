@@ -2,7 +2,7 @@
 // Phase 01 stub: boots canvas, verifies DOM, paints dark background.
 // Fully wired in Phase 13.
 
-const canvas    = document.getElementById('tank-canvas')    as HTMLCanvasElement;
+const canvas = document.getElementById('tank-canvas') as HTMLCanvasElement;
 const container = document.getElementById('tank-container') as HTMLDivElement;
 
 if (!canvas || !container) {
@@ -14,7 +14,7 @@ if (!canvas || !container) {
 // window.innerHeight, so the toolbar height is properly excluded.
 
 function resizeCanvas(): void {
-  canvas.width  = container.clientWidth;
+  canvas.width = container.clientWidth;
   canvas.height = container.clientHeight;
 
   // Repaint placeholder background so no white flash on resize
@@ -35,7 +35,4 @@ if (!ctx) throw new Error('[Abyssarium] Could not get 2D canvas context.');
 ctx.fillStyle = '#020a10';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-console.log(
-  '[Abyssarium] Phase 01 boot — canvas ready:',
-  canvas.width, 'x', canvas.height,
-);
+console.log('[Abyssarium] Phase 01 boot — canvas ready:', canvas.width, 'x', canvas.height);
