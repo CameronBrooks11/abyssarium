@@ -1,6 +1,6 @@
 # agent-policy.yaml — Abyssarium
 # Governs automated agents (Copilot, CI bots, code generators) working in
-# this repository. Updated to its final form in Phase 16.
+# this repository.
 
 version: 1
 
@@ -8,38 +8,97 @@ metadata:
   project: abyssarium
   description: >
     A browser-based procedural aquarium simulation.
-    Canvas 2D only. No UI frameworks. No physics engines. No backend.
+    Canvas 2D only. No UI frameworks. No physics engines.
+
+# ── Rules ─────────────────────────────────────────────────────────────────────
 
 rules:
+  # Technical stack constraints
   - id: no-ui-framework
     description: No React, Vue, Angular, Svelte or similar component frameworks.
-    deny: ["react", "react-dom", "vue", "@angular/core", "svelte", "solid-js", "preact"]
+    deny_packages: [react, react-dom, vue, "@angular/core", svelte, solid-js, preact]
     severity: error
 
   - id: no-physics-engine
     description: Physics must be hand-written. No external physics engines.
-    deny: ["matter-js", "cannon", "cannon-es", "rapier", "planck", "p2", "@dimforge/rapier2d"]
+    deny_packages: [matter-js, cannon, "cannon-es", rapier, planck, p2, "@dimforge/rapier2d"]
     severity: error
 
   - id: no-webgl-renderer
     description: Rendering is Canvas 2D only. No WebGL, Three.js, PixiJS, or Babylon.
-    deny: ["three", "pixi.js", "@pixi/core", "babylonjs", "@babylonjs/core"]
+    deny_packages: [three, pixi.js, "@pixi/core", babylonjs, "@babylonjs/core"]
     severity: error
 
+  # Code structure constraints
   - id: no-dom-in-simulation
     description: >
       Modules in src/tank/, src/creatures/, src/particles/, src/systems/Physics.ts,
-      src/systems/BehaviorSystem.ts, and src/utils/ must not use the DOM.
-      DOM access is restricted to src/ui/, src/systems/InputSystem.ts,
-      src/systems/Renderer.ts, and src/main.ts.
+      src/systems/BehaviorSystem.ts, and src/utils/ must not import from the DOM.
+      DOM access is restricted to src/ui/, src/systems/InputSystem.ts, src/systems/Renderer.ts,
+      and src/main.ts.
+    applies_to:
+      - "src/tank/**"
+      - "src/creatures/**"
+      - "src/particles/**"
+      - "src/utils/**"
+    deny_imports: ["document", "window", "HTMLElement", "HTMLCanvasElement"]
     severity: error
 
-  - id: test-required
-    description: All new modules under src/creatures/ and src/systems/ must have a test.
-    applies_to: ["src/creatures/**", "src/systems/**", "src/utils/**"]
+  - id: test-required-for-systems
+    description: >
+      Every new module added to src/systems/, src/creatures/, or src/utils/
+      must have a corresponding test file in tests/.
+    applies_to:
+      - "src/systems/**"
+      - "src/creatures/**"
+      - "src/utils/**"
     requires_test: true
     severity: warning
 
   - id: no-global-state
-    description: No module-level mutable singletons. Use constructor injection.
+    description: >
+      Do not introduce module-level mutable singletons. Constructor injection
+      is the pattern used throughout.
     severity: warning
+
+  # Quality constraints
+  - id: no-any-in-utils
+    description: >
+      src/utils/ must be strictly typed. Use of 'any' is forbidden in utility modules.
+    applies_to: ["src/utils/**"]
+    deny: ["as any", ": any"]
+    severity: error
+
+  - id: max-creatures-cap
+    description: >
+      The effective maximum number of live creatures must not exceed 100
+      without a documented performance justification.
+    max_value: 100
+    severity: warning
+
+  - id: no-hardcoded-magic-numbers
+    description: >
+      Physics constants, behavior weights, and timing values must be defined
+      as named constants, not inline literals.
+    applies_to:
+      - "src/systems/Physics.ts"
+      - "src/systems/BehaviorSystem.ts"
+      - "src/tank/Fluid.ts"
+    severity: warning
+
+# ── Automated agent guidelines ────────────────────────────────────────────────
+
+agent_guidelines:
+  - When adding a new creature body plan, add a draw function in
+    src/systems/drawCreature.ts, a case in the switch, and at least one test.
+  - When adding a new interaction/button, implement the full chain:
+    1. Add event type to TankEventType const
+    2. Add payload to TankEventPayload union
+    3. Add handler in InteractionHandlers.ts
+    4. Bind button in controls.ts
+    5. Document in docs/concept.md
+  - When modifying PhysicsSystem, re-run physics tests before assuming correctness.
+  - When changing simulation constants (energy rates, drag, etc.), note the
+    before/after in the commit message.
+  - Never use console.error or console.warn in production code paths; use
+    custom error types or return Result<T, E>.

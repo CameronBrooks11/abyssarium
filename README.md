@@ -1,5 +1,7 @@
 # Abyssarium
 
+[![CI](https://github.com/CameronBrooks11/abyssarium/actions/workflows/ci.yml/badge.svg)](https://github.com/CameronBrooks11/abyssarium/actions/workflows/ci.yml)
+
 > A chaotic procedural aquarium where strange creatures evolve, swarm, and
 > react to disturbances in a simulated fluid tank.
 
