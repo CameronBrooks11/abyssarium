@@ -33,7 +33,7 @@ export const bindControls = (input: InputSystem, tank: Tank, rng: Rng): void => 
 
   // ── Light Pulse ───────────────────────────────────────────────────────────
   btn('btn-light').addEventListener('click', () => {
-    input.queueLightPulse(1.0, 2.5);
+    input.queueLightPulse(1.0);
   });
 
   // ── Spawn Creature ────────────────────────────────────────────────────────

@@ -7,11 +7,11 @@
  *  take effect on the same physics tick. */
 
 import type { Tank } from '@/tank/Tank';
-import type { TankEvent, TankEventPayload, CatastropheKind } from '@/types/entities';
+import type { TankEvent, CatastropheKind } from '@/types/entities';
 import type { Vec2 } from '@/utils/vec2';
 
 export class InputSystem {
-  private readonly queue: TankEventPayload[] = [];
+  private readonly queue: TankEvent[] = [];
 
   // ── Public API — called by controls.ts button/canvas handlers ─────────────
 
@@ -23,14 +23,14 @@ export class InputSystem {
     this.queue.push({ type: 'ShakeTank', magnitude });
   }
 
-  queueLightPulse(intensity = 1, duration = 2): void {
-    this.queue.push({ type: 'LightPulse', intensity, duration });
+  queueLightPulse(intensity = 1): void {
+    this.queue.push({ type: 'LightPulse', intensity });
   }
 
   queueSpawnCreature(position?: Vec2): void {
-    const payload: TankEventPayload =
+    const event: TankEvent =
       position !== undefined ? { type: 'SpawnCreature', position } : { type: 'SpawnCreature' };
-    this.queue.push(payload);
+    this.queue.push(event);
   }
 
   queueCatastrophe(kind: CatastropheKind): void {
@@ -41,13 +41,7 @@ export class InputSystem {
 
   /** Drain the queue, emitting each pending action as a TankEvent. */
   flush(tank: Tank): void {
-    for (const payload of this.queue) {
-      const event: TankEvent = {
-        type: payload.type,
-        payload,
-      };
-      tank.events.emit(event);
-    }
+    for (const event of this.queue) tank.events.emit(event);
     this.queue.length = 0;
   }
 }

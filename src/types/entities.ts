@@ -84,15 +84,6 @@ export type ParticleKind = (typeof ParticleKind)[keyof typeof ParticleKind];
 
 // ── Tank event types ──────────────────────────────────────────────────────────
 
-export const TankEventType = {
-  AddFood: 'AddFood',
-  ShakeTank: 'ShakeTank',
-  LightPulse: 'LightPulse',
-  SpawnCreature: 'SpawnCreature',
-  Catastrophe: 'Catastrophe',
-} as const;
-export type TankEventType = (typeof TankEventType)[keyof typeof TankEventType];
-
 export const CatastropheKind = {
   PredatorSpawn: 'predator_spawn',
   ToxicBloom: 'toxic_bloom',
@@ -103,14 +94,9 @@ export type CatastropheKind = (typeof CatastropheKind)[keyof typeof CatastropheK
 
 // ── Tank event ────────────────────────────────────────────────────────────────
 
-export interface TankEvent {
-  readonly type: TankEventType;
-  readonly payload: TankEventPayload;
-}
-
-export type TankEventPayload =
-  | { type: 'AddFood'; position: Vec2; count: number }
-  | { type: 'ShakeTank'; magnitude: number }
-  | { type: 'LightPulse'; intensity: number; duration: number }
-  | { type: 'SpawnCreature'; position?: Vec2 }
-  | { type: 'Catastrophe'; kind: CatastropheKind };
+export type TankEvent =
+  | { readonly type: 'AddFood'; position: Vec2; count: number }
+  | { readonly type: 'ShakeTank'; magnitude: number }
+  | { readonly type: 'LightPulse'; intensity: number }
+  | { readonly type: 'SpawnCreature'; position?: Vec2 }
+  | { readonly type: 'Catastrophe'; kind: CatastropheKind };

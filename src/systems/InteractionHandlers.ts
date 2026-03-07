@@ -1,17 +1,13 @@
 /** registerInteractionHandlers — subscribes one handler per TankEvent type.
  *
- *  Each handler is a pure side-effector: reads the event payload and mutates
+ *  Each handler is a pure side-effector: reads event fields and mutates
  *  Tank state (particles, creatures, fluid fields).  No rendering, no DOM.
- *
- *  Note: TankEvent is a flat interface (not a discriminated union), so the
- *  EventBus.on handler types narrow to `never`. We bridge this with a small
- *  `sub` helper that casts to the correct event type at the registration site.
  *
  *  Returns an array of unsubscribe functions for cleanup. */
 
 import type { Tank } from '@/tank/Tank';
-import type { TankEvent } from '@/types/entities';
-import { TankEventType, CatastropheKind, CreatureLifeState } from '@/types/entities';
+import { CatastropheKind, CreatureLifeState } from '@/types/entities';
+import type { Vec2 } from '@/utils/vec2';
 import { spawnFood } from '@/particles/Food';
 import { spawnBubble } from '@/particles/Bubble';
 import { CreatureFactory } from '@/creatures/CreatureFactory';
@@ -29,38 +25,24 @@ const MAX_PARTICLES = 600;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const registerInteractionHandlers = (tank: Tank): (() => void)[] => {
-  // TankEvent is a flat interface, not a discriminated union, so EventBus.on's
-  // Extract<TankEvent, {type:K}> resolves to `never`. Use a typed cast bridge.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sub = (type: TankEvent['type'], handler: (e: TankEvent) => void): (() => void) =>
-    (tank.events as any).on(type, handler);
-
-  return [
-    sub('AddFood', e => handleAddFood(tank, e)),
-    sub('ShakeTank', e => handleShakeTank(tank, e)),
-    sub('LightPulse', e => handleLightPulse(tank, e)),
-    sub('SpawnCreature', e => handleSpawnCreature(tank, e)),
-    sub('Catastrophe', e => handleCatastrophe(tank, e)),
-  ];
-};
+export const registerInteractionHandlers = (tank: Tank): (() => void)[] => [
+  tank.events.on('AddFood', ({ position, count }) => handleAddFood(tank, position, count)),
+  tank.events.on('ShakeTank', ({ magnitude }) => handleShakeTank(tank, magnitude)),
+  tank.events.on('LightPulse', ({ intensity }) => handleLightPulse(tank, intensity)),
+  tank.events.on('SpawnCreature', ({ position }) => handleSpawnCreature(tank, position)),
+  tank.events.on('Catastrophe', ({ kind }) => handleCatastrophe(tank, kind)),
+];
 
 // ── Add Food ──────────────────────────────────────────────────────────────────
 
-const handleAddFood = (tank: Tank, event: TankEvent): void => {
-  if (event.payload.type !== TankEventType.AddFood) return;
-  const { position, count } = event.payload;
+const handleAddFood = (tank: Tank, position: Vec2, count: number): void => {
   const cap = Math.min(count, MAX_PARTICLES - tank.particles.length);
-  for (let i = 0; i < cap; i++) {
-    tank.particles.push(spawnFood(position, rng));
-  }
+  for (let i = 0; i < cap; i++) tank.particles.push(spawnFood(position, rng));
 };
 
 // ── Shake Tank ────────────────────────────────────────────────────────────────
 
-const handleShakeTank = (tank: Tank, event: TankEvent): void => {
-  if (event.payload.type !== TankEventType.ShakeTank) return;
-  const { magnitude } = event.payload;
+const handleShakeTank = (tank: Tank, magnitude: number): void => {
 
   for (const creature of tank.creatures) {
     const angle = rngFloat(rng, 0, Math.PI * 2);
@@ -94,9 +76,7 @@ const handleShakeTank = (tank: Tank, event: TankEvent): void => {
 
 // ── Light Pulse ───────────────────────────────────────────────────────────────
 
-const handleLightPulse = (tank: Tank, event: TankEvent): void => {
-  if (event.payload.type !== TankEventType.LightPulse) return;
-  const { intensity } = event.payload;
+const handleLightPulse = (tank: Tank, intensity: number): void => {
   tank.lightIntensity = Math.min(1, tank.lightIntensity + intensity);
 
   const burstCount = 15;
@@ -116,25 +96,22 @@ const handleLightPulse = (tank: Tank, event: TankEvent): void => {
 
 // ── Spawn Creature ────────────────────────────────────────────────────────────
 
-const handleSpawnCreature = (tank: Tank, event: TankEvent): void => {
-  if (event.payload.type !== TankEventType.SpawnCreature) return;
+const handleSpawnCreature = (tank: Tank, position: Vec2 | undefined): void => {
   const liveCount = tank.creatures.filter(c => c.lifeState !== CreatureLifeState.Dead).length;
   if (liveCount >= MAX_CREATURES) return;
 
-  const position = event.payload.position ?? {
+  const pos = position ?? {
     x: rngFloat(rng, tank.width * 0.1, tank.width * 0.9),
     y: tank.height * 0.05,
   };
 
-  tank.creatures.push(factory.create(position, rng));
+  tank.creatures.push(factory.create(pos, rng));
 };
 
 // ── Catastrophe ───────────────────────────────────────────────────────────────
 
-const handleCatastrophe = (tank: Tank, event: TankEvent): void => {
-  if (event.payload.type !== TankEventType.Catastrophe) return;
-
-  switch (event.payload.kind) {
+const handleCatastrophe = (tank: Tank, kind: CatastropheKind): void => {
+  switch (kind) {
     case CatastropheKind.PredatorSpawn:
       handlePredatorSpawn(tank);
       break;

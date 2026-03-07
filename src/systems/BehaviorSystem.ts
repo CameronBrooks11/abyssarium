@@ -35,7 +35,7 @@ export class BehaviorSystem {
   update(tank: Tank, dt: number): void {
     for (const creature of tank.creatures) {
       if (creature.lifeState !== CreatureLifeState.Alive) {
-        creature.tickDying(dt);
+        if (creature.lifeState === CreatureLifeState.Dying) creature.tickDying(dt);
         continue;
       }
       this.updateCreature(creature, tank, dt);

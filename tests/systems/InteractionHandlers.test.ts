@@ -3,7 +3,7 @@ import { registerInteractionHandlers } from '@/systems/InteractionHandlers';
 import { Tank } from '@/tank/Tank';
 import { CreatureFactory } from '@/creatures/CreatureFactory';
 import { createRng } from '@/utils/rng';
-import { nextId, CatastropheKind } from '@/types/entities';
+import { CatastropheKind } from '@/types/entities';
 import type { TankEvent } from '@/types/entities';
 
 const factory = new CreatureFactory();
@@ -15,13 +15,8 @@ const makeTank = () => {
   return tank;
 };
 
-const emit = (tank: Tank, payload: TankEvent['payload']): void => {
-  tank.events.emit({
-    id: nextId('ev'),
-    type: payload.type,
-    timestamp: 0,
-    payload,
-  } as TankEvent);
+const emit = (tank: Tank, event: TankEvent): void => {
+  tank.events.emit(event);
 };
 
 describe('registerInteractionHandlers', () => {
@@ -71,21 +66,21 @@ describe('registerInteractionHandlers', () => {
     it('increases lightIntensity', () => {
       const tank = makeTank();
       expect(tank.lightIntensity).toBe(0);
-      emit(tank, { type: 'LightPulse', intensity: 0.7, duration: 1 });
+      emit(tank, { type: 'LightPulse', intensity: 0.7 });
       expect(tank.lightIntensity).toBeGreaterThan(0);
     });
 
     it('clamps lightIntensity at 1', () => {
       const tank = makeTank();
       tank.lightIntensity = 0.8;
-      emit(tank, { type: 'LightPulse', intensity: 1.0, duration: 1 });
+      emit(tank, { type: 'LightPulse', intensity: 1.0 });
       expect(tank.lightIntensity).toBeLessThanOrEqual(1);
     });
 
     it('adds bubble particles', () => {
       const tank = makeTank();
       const before = tank.particles.length;
-      emit(tank, { type: 'LightPulse', intensity: 0.5, duration: 1 });
+      emit(tank, { type: 'LightPulse', intensity: 0.5 });
       expect(tank.particles.length).toBeGreaterThan(before);
     });
   });
