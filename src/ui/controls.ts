@@ -21,9 +21,7 @@ export const bindControls = (input: InputSystem, tank: Tank, rng: Rng): void => 
 
   // ── Add Food ───────────────────────────────────────────────────────────────
   btn('btn-food').addEventListener('click', () => {
-    const x = 80 + Math.random() * (tank.width - 160);
-    const y = tank.height * 0.1;
-    input.queueAddFood({ x, y }, 10);
+    input.queueAddFood(10);
   });
 
   // ── Shake Tank ────────────────────────────────────────────────────────────
@@ -38,8 +36,7 @@ export const bindControls = (input: InputSystem, tank: Tank, rng: Rng): void => 
 
   // ── Spawn Creature ────────────────────────────────────────────────────────
   btn('btn-spawn').addEventListener('click', () => {
-    const x = 80 + Math.random() * (tank.width - 160);
-    input.queueSpawnCreature({ x, y: 60 });
+    input.queueSpawnCreature();
   });
 
   // ── Catastrophe ───────────────────────────────────────────────────────────
@@ -51,6 +48,6 @@ export const bindControls = (input: InputSystem, tank: Tank, rng: Rng): void => 
   const canvas = document.getElementById('tank-canvas') as HTMLCanvasElement;
   canvas.addEventListener('click', (e: MouseEvent) => {
     const rect = canvas.getBoundingClientRect();
-    input.queueAddFood({ x: e.clientX - rect.left, y: e.clientY - rect.top }, 5);
+    input.queueAddFood(5, { x: e.clientX - rect.left, y: e.clientY - rect.top });
   });
 };

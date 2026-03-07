@@ -95,7 +95,7 @@ export type CatastropheKind = (typeof CatastropheKind)[keyof typeof CatastropheK
 // ── Tank event ────────────────────────────────────────────────────────────────
 
 export type TankEvent =
-  | { readonly type: 'AddFood'; position: Vec2; count: number }
+  | { readonly type: 'AddFood'; position?: Vec2; count: number }
   | { readonly type: 'ShakeTank'; magnitude: number }
   | { readonly type: 'LightPulse'; intensity: number }
   | { readonly type: 'SpawnCreature'; position?: Vec2 }

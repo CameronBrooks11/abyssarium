@@ -35,9 +35,15 @@ export const registerInteractionHandlers = (tank: Tank): (() => void)[] => [
 
 // ── Add Food ──────────────────────────────────────────────────────────────────
 
-const handleAddFood = (tank: Tank, position: Vec2, count: number): void => {
+const handleAddFood = (tank: Tank, position: Vec2 | undefined, count: number): void => {
   const cap = Math.min(count, MAX_PARTICLES - tank.particles.length);
-  for (let i = 0; i < cap; i++) tank.particles.push(spawnFood(position, rng));
+  for (let i = 0; i < cap; i++) {
+    const pos = position ?? {
+      x: rngFloat(rng, 40, tank.width - 40),
+      y: rngFloat(rng, 40, tank.height - 40),
+    };
+    tank.particles.push(spawnFood(pos, rng));
+  }
 };
 
 // ── Shake Tank ────────────────────────────────────────────────────────────────
@@ -102,7 +108,7 @@ const handleSpawnCreature = (tank: Tank, position: Vec2 | undefined): void => {
 
   const pos = position ?? {
     x: rngFloat(rng, tank.width * 0.1, tank.width * 0.9),
-    y: tank.height * 0.05,
+    y: rngFloat(rng, tank.height * 0.1, tank.height * 0.9),
   };
 
   tank.creatures.push(factory.create(pos, rng));
@@ -135,7 +141,7 @@ const handlePredatorSpawn = (tank: Tank): void => {
     const creature = factory.create(
       {
         x: rngFloat(rng, tank.width * 0.2, tank.width * 0.8),
-        y: tank.height * 0.03,
+        y: rngFloat(rng, tank.height * 0.1, tank.height * 0.9),
       },
       rng,
       {

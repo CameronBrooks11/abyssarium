@@ -15,8 +15,10 @@ export class InputSystem {
 
   // ── Public API — called by controls.ts button/canvas handlers ─────────────
 
-  queueAddFood(position: Vec2, count = 8): void {
-    this.queue.push({ type: 'AddFood', position, count });
+  queueAddFood(count = 8, position?: Vec2): void {
+    const event: TankEvent =
+      position !== undefined ? { type: 'AddFood', count, position } : { type: 'AddFood', count };
+    this.queue.push(event);
   }
 
   queueShakeTank(magnitude = 180): void {
