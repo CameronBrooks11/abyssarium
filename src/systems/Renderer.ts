@@ -20,30 +20,41 @@ import { CreatureLifeState } from '@/types/entities';
 import type { Vec2 } from '@/utils/vec2';
 
 export class Renderer {
+  private readonly dpr: number;
   private readonly ctx: CanvasRenderingContext2D;
-  private readonly glowCanvas: OffscreenCanvas;
-  private readonly glowCtx: OffscreenCanvasRenderingContext2D;
+  private readonly glowCanvas: OffscreenCanvas | HTMLCanvasElement;
+  private readonly glowCtx: CanvasRenderingContext2D;
 
   constructor(private readonly canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get 2D canvas context');
     this.ctx = ctx;
 
-    this.glowCanvas = new OffscreenCanvas(canvas.width, canvas.height);
+    this.dpr = Math.min(typeof window !== 'undefined' ? (window.devicePixelRatio ?? 1) : 1, 2);
+
+    if (typeof OffscreenCanvas !== 'undefined') {
+      this.glowCanvas = new OffscreenCanvas(canvas.width, canvas.height);
+    } else {
+      const fallback = document.createElement('canvas');
+      fallback.width = canvas.width;
+      fallback.height = canvas.height;
+      this.glowCanvas = fallback;
+    }
     const gCtx = this.glowCanvas.getContext('2d');
     if (!gCtx) throw new Error('Could not get offscreen 2D context');
-    this.glowCtx = gCtx;
+    this.glowCtx = gCtx as CanvasRenderingContext2D;
   }
 
   resize(width: number, height: number): void {
-    this.glowCanvas.width = width;
-    this.glowCanvas.height = height;
+    this.glowCanvas.width = width * this.dpr;
+    this.glowCanvas.height = height * this.dpr;
   }
 
   render(tank: Tank, alpha: number): void {
-    const { ctx, canvas } = this;
-    const w = canvas.width;
-    const h = canvas.height;
+    const { ctx, canvas, dpr } = this;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const w = canvas.width / dpr;
+    const h = canvas.height / dpr;
 
     // ── 1. Background ──────────────────────────────────────────────────────
     drawBackground(ctx, w, h, tank.lightIntensity, tank.time);
@@ -83,7 +94,7 @@ export class Renderer {
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     ctx.globalAlpha = 0.75;
-    ctx.drawImage(this.glowCanvas, 0, 0);
+    ctx.drawImage(this.glowCanvas as CanvasImageSource, 0, 0, w, h);
     ctx.restore();
 
     // ── 7. Light pulse screen flash ───────────────────────────────────────
@@ -100,6 +111,7 @@ export class Renderer {
 
   private renderGlowLayer(tank: Tank, alpha: number, w: number, h: number): void {
     const gc = this.glowCtx;
+    gc.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     gc.clearRect(0, 0, w, h);
 
     for (const creature of tank.creatures) {

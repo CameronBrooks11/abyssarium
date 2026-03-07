@@ -24,6 +24,22 @@ export const drawCreature = (
   ctx.translate(pos.x, pos.y);
   ctx.rotate(creature.body.angle);
 
+  // Death scale-down: shrink to 60 % as creature fades out
+  if (globalAlpha < 1) {
+    const deathScale = 0.6 + globalAlpha * 0.4;
+    ctx.scale(deathScale, deathScale);
+  }
+
+  // Bioluminescence trail — soft halo drawn behind main body
+  if (creature.glowIntensity > 0.6) {
+    const [base] = creature.traits.palette;
+    const trailAlpha = (creature.glowIntensity - 0.6) * 0.4;
+    ctx.beginPath();
+    ctx.arc(0, 0, creature.radius * 1.2, 0, Math.PI * 2);
+    ctx.fillStyle = `hsla(${base.h},${base.s}%,${base.l}%,${trailAlpha.toFixed(3)})`;
+    ctx.fill();
+  }
+
   switch (creature.traits.bodyPlan) {
     case BodyPlan.Blob:
       drawBlob(ctx, creature, time);

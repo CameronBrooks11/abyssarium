@@ -146,6 +146,15 @@ export class Creature {
   }
 
   /**
+   * Instantly reduce energy by amount (e.g. from toxic events).
+   * Clamps to 0 but does not trigger the Dying state by itself.
+   * Callers that need a dying transition should check energy afterward.
+   */
+  drain(amount: number): void {
+    this.energy = Math.max(0, this.energy - amount);
+  }
+
+  /**
    * Progress the dying countdown. Returns true once the creature is fully Dead.
    */
   tickDying(dt: number): boolean {

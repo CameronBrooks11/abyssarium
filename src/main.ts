@@ -20,9 +20,10 @@ const getContainerSize = () => ({
   width: container.clientWidth || window.innerWidth,
   height: container.clientHeight || window.innerHeight - 48,
 });
+const dpr = Math.min(typeof window !== 'undefined' ? (window.devicePixelRatio ?? 1) : 1, 2);
 const applySize = (width: number, height: number): void => {
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
 };
 const { width: initW, height: initH } = getContainerSize();
 applySize(initW, initH);

@@ -15,6 +15,7 @@ import { TankEventType, CatastropheKind, CreatureLifeState } from '@/types/entit
 import { spawnFood } from '@/particles/Food';
 import { spawnBubble } from '@/particles/Bubble';
 import { CreatureFactory } from '@/creatures/CreatureFactory';
+import { hsla } from '@/utils/color';
 import { applyImpulse } from '@/systems/Physics';
 import { createRng, rngFloat, rngInt } from '@/utils/rng';
 
@@ -160,14 +161,13 @@ const handlePredatorSpawn = (tank: Tank): void => {
         y: tank.height * 0.03,
       },
       rng,
+      {
+        aggression: rngFloat(rng, 0.8, 1.0),
+        speed: rngFloat(rng, 180, 260),
+        scale: rngFloat(rng, 1.6, 2.5),
+        foodPreference: 'carnivore',
+      },
     );
-    // CreatureTraits is readonly, but Predator Spawn forces archetype override
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const t = creature.traits as any;
-    t.aggression = rngFloat(rng, 0.8, 1.0);
-    t.speed = rngFloat(rng, 180, 260);
-    t.scale = rngFloat(rng, 1.6, 2.5);
-    t.foodPreference = 'carnivore';
     tank.creatures.push(creature);
   }
 };
@@ -177,7 +177,7 @@ const handlePredatorSpawn = (tank: Tank): void => {
 const handleToxicBloom = (tank: Tank): void => {
   for (const c of tank.creatures) {
     if (c.lifeState === CreatureLifeState.Alive) {
-      c.energy = Math.max(0.1, c.energy * 0.45);
+      c.drain(c.energy * 0.55);
     }
   }
 
@@ -193,9 +193,8 @@ const handleToxicBloom = (tank: Tank): void => {
         y: rngFloat(rng, tank.height * 0.2, tank.height * 0.8),
       },
       rng,
+      hsla(120, 90, 45, 0.9),
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (p as any).color = { h: 120, s: 90, l: 45, a: 0.9 };
     tank.particles.push(p);
   }
 };

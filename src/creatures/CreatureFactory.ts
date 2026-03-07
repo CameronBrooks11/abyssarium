@@ -78,17 +78,24 @@ const ARCHETYPE_FOOD: Record<Archetype, FoodPreference> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export class CreatureFactory {
-  /** Create a fully randomised Creature at the given position. */
-  create(position: Vec2, rng: Rng): Creature {
+  /**
+   * Create a fully randomised Creature at the given position.
+   * Optional `overrides` are shallow-merged into generated traits after generation,
+   * allowing callers (e.g. catastrophe handlers) to force specific values without
+   * resorting to `as any` casts on readonly trait properties.
+   */
+  create(position: Vec2, rng: Rng, overrides?: Partial<CreatureTraits>): Creature {
     const archetype = rngPick(rng, ARCHETYPES);
     const traits = this.generateTraits(archetype, rng);
     const species = `${rngPick(rng, GENERA)} ${rngPick(rng, DESCRIPTORS)}`;
+
+    const mergedTraits: CreatureTraits = overrides ? { ...traits, ...overrides } : traits;
 
     const spec: CreatureSpec = {
       id: nextId('cr'),
       species,
       position: { ...position },
-      traits,
+      traits: mergedTraits,
     };
 
     return new Creature(spec);
