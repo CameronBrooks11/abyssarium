@@ -1,37 +1,20 @@
-/** Particle — a lightweight simulation object with finite lifetime.
- *  Stub for Phase 04 dependency resolution; fully implemented in Phase 06.
+/** Particle — a lightweight simulation object with a finite lifetime.
  *
- *  Implements HasPosition via a getter so it is accepted by SpatialHash<Particle>. */
+ *  Implemented as a class so the `position` getter always reflects
+ *  `body.position`, which is replaced (not mutated) on each physics step.
+ *  This keeps SpatialHash<Particle> queries consistent. */
 
 import type { Vec2 } from '@/utils/vec2';
 import { vec2Zero, vec2Clone } from '@/utils/vec2';
 import type { HSLA } from '@/utils/color';
 import type { ParticleId, ParticleKind, RigidBody } from '@/types/entities';
 
-export interface Particle {
-  readonly id: ParticleId;
-  readonly kind: ParticleKind;
-  body: RigidBody;
-  /** Position snapshot for render interpolation. */
-  prevPosition: Vec2;
-  /** Spatial position — mirrors body.position; needed for SpatialHash<Particle>. */
-  readonly position: Vec2;
-  /** Radius in pixels. */
-  radius: number;
-  /** Remaining lifetime in seconds. Zero = expired. */
-  life: number;
-  /** Maximum lifetime, used to compute alpha fade fraction. */
-  maxLife: number;
-  /** Visual color. */
-  color: HSLA;
-  /** Spin direction for debris tumble. */
-  spin: number;
-}
+// ── RigidBody factory ─────────────────────────────────────────────────────────
 
-/** Minimal RigidBody factory used by particle spawners. */
-export const makeParticleBody = (
-  position: Vec2,
-  velocity: Vec2,
+/** Build a RigidBody for a particle with sensible angular defaults. */
+export const makeBody = (
+  position: Readonly<Vec2>,
+  velocity: Readonly<Vec2>,
   mass: number,
   drag: number,
 ): RigidBody => ({
@@ -44,3 +27,60 @@ export const makeParticleBody = (
   drag,
   angularDrag: 0.3,
 });
+
+// ── Particle class ────────────────────────────────────────────────────────────
+
+export class Particle {
+  readonly id: ParticleId;
+  readonly kind: ParticleKind;
+
+  body: RigidBody;
+
+  /** Position at the start of the previous physics step — for render lerp. */
+  prevPosition: Vec2;
+
+  /** Radius in pixels. */
+  radius: number;
+
+  /** Remaining lifetime in seconds. Zero = expired and will be pruned. */
+  life: number;
+
+  /** Maximum lifetime — used to compute alpha fade. */
+  maxLife: number;
+
+  /** Visual color. */
+  color: HSLA;
+
+  /** Spin rate (radians/s). Non-zero only for debris. */
+  spin: number;
+
+  constructor(init: {
+    id: ParticleId;
+    kind: ParticleKind;
+    body: RigidBody;
+    prevPosition: Vec2;
+    radius: number;
+    life: number;
+    maxLife: number;
+    color: HSLA;
+    spin: number;
+  }) {
+    this.id = init.id;
+    this.kind = init.kind;
+    this.body = init.body;
+    this.prevPosition = init.prevPosition;
+    this.radius = init.radius;
+    this.life = init.life;
+    this.maxLife = init.maxLife;
+    this.color = init.color;
+    this.spin = init.spin;
+  }
+
+  /**
+   * Live position for SpatialHash<Particle> — always reflects body.position,
+   * which is replaced on each physics integration step.
+   */
+  get position(): Vec2 {
+    return this.body.position;
+  }
+}
