@@ -57,10 +57,6 @@ export const computeBoids = (creature: Creature, tank: Tank): Vec2 => {
 
   if (cohCount === 0) return vec2Zero();
 
-  // Update flock center on creature for BehaviorSystem reference
-  creature.flockCenter = { x: cohX / cohCount, y: cohY / cohCount };
-  creature.flockCount = cohCount;
-
   let force: Vec2 = vec2Zero();
 
   if (sepCount > 0) {

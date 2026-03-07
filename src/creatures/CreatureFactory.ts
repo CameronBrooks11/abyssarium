@@ -96,6 +96,8 @@ export class CreatureFactory {
       species,
       position: { ...position },
       traits: mergedTraits,
+      angle: rngFloat(rng, 0, Math.PI * 2),
+      animPhase: rngFloat(rng, 0, Math.PI * 2),
     };
 
     return new Creature(spec);

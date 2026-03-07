@@ -41,16 +41,6 @@ export const drawParticle = (ctx: CanvasRenderingContext2D, p: Particle, alpha: 
       ctx.fillRect(-p.radius, -p.radius * 0.5, p.radius * 2, p.radius);
       break;
     }
-    case 'glow': {
-      const grad = ctx.createRadialGradient(x, y, 0, x, y, p.radius * 2);
-      grad.addColorStop(0, hslaToString(p.color));
-      grad.addColorStop(1, `hsla(${p.color.h},${p.color.s}%,${p.color.l}%,0)`);
-      ctx.beginPath();
-      ctx.arc(x, y, p.radius * 2, 0, Math.PI * 2);
-      ctx.fillStyle = grad;
-      ctx.fill();
-      break;
-    }
   }
 
   ctx.restore();

@@ -135,27 +135,6 @@ export class PhysicsSystem {
     body.velocity = { x: vx, y: vy };
   }
 
-  /**
-   * Apply a radial turbulence impulse to a body.
-   * Direction is biased away from centre with random jitter.
-   * Used for ShakeTank, Catastrophe events, etc.
-   */
-  applyTurbulence(
-    body: RigidBody,
-    centreX: number,
-    centreY: number,
-    magnitude: number,
-    rng: () => number,
-  ): void {
-    const dx = body.position.x - centreX;
-    const dy = body.position.y - centreY;
-    const angle = Math.atan2(dy, dx) + (rng() - 0.5) * Math.PI;
-    applyImpulse(body, {
-      x: Math.cos(angle) * magnitude,
-      y: Math.sin(angle) * magnitude,
-    });
-  }
-
   // ── Private ────────────────────────────────────────────────────────────────
 
   /** Push body away from walls proportionally once it enters the margin zone. */

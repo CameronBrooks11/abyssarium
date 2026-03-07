@@ -6,7 +6,7 @@
  *  Usage:
  *    const bus = new EventBus<TankEvent>();
  *    const unsub = bus.on('AddFood', e => console.log(e.payload));
- *    bus.emit({ id, type: 'AddFood', timestamp, payload: { ... } });
+ *    bus.emit({ type: 'AddFood', payload: { ... } });
  *    unsub(); // remove listener
  */
 
@@ -26,10 +26,5 @@ export class EventBus<T extends { type: string }> {
   /** Emit an event to all registered handlers of its type. */
   emit(event: T): void {
     this.listeners.get(event.type)?.forEach(h => h(event));
-  }
-
-  /** Remove all listeners. */
-  clear(): void {
-    this.listeners.clear();
   }
 }

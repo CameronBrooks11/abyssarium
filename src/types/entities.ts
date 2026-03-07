@@ -12,22 +12,12 @@ type Brand<B> = { readonly [__brand]: B };
 
 export type CreatureId = string & Brand<'CreatureId'>;
 export type ParticleId = string & Brand<'ParticleId'>;
-export type EventId = string & Brand<'EventId'>;
 
 let _idCounter = 0;
 
 /** Generate a unique branded ID with the given prefix. */
 export const nextId = <T extends string>(prefix: string): T =>
   `${prefix}_${(++_idCounter).toString(36)}` as T;
-
-// ── Axis-aligned bounding box ─────────────────────────────────────────────────
-
-export interface Aabb {
-  readonly x: number;
-  readonly y: number;
-  readonly width: number;
-  readonly height: number;
-}
 
 // ── Rigid body physics state ──────────────────────────────────────────────────
 
@@ -89,7 +79,6 @@ export const ParticleKind = {
   Food: 'food',
   Bubble: 'bubble',
   Debris: 'debris',
-  Glow: 'glow',
 } as const;
 export type ParticleKind = (typeof ParticleKind)[keyof typeof ParticleKind];
 
@@ -115,9 +104,7 @@ export type CatastropheKind = (typeof CatastropheKind)[keyof typeof CatastropheK
 // ── Tank event ────────────────────────────────────────────────────────────────
 
 export interface TankEvent {
-  readonly id: EventId;
   readonly type: TankEventType;
-  readonly timestamp: number; // performance.now() at time of emission
   readonly payload: TankEventPayload;
 }
 

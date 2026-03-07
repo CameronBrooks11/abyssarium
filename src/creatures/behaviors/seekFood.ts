@@ -15,7 +15,6 @@ const FOOD_ENERGY_GAIN = 18;
 export const computeSeekFood = (creature: Creature, tank: Tank): Vec2 => {
   // Carnivores hunt prey, not food particles
   if (creature.traits.foodPreference === 'carnivore') {
-    creature.targetFoodId = null;
     return { x: 0, y: 0 };
   }
 
@@ -40,17 +39,13 @@ export const computeSeekFood = (creature: Creature, tank: Tank): Vec2 => {
   }
 
   if (bestFood === null) {
-    creature.targetFoodId = null;
     return { x: 0, y: 0 };
   }
-
-  creature.targetFoodId = bestFood.id;
 
   // Consume on contact
   if (bestDistSq <= EAT_DISTANCE_SQ) {
     bestFood.life = 0;
     creature.feed(FOOD_ENERGY_GAIN);
-    creature.targetFoodId = null;
     return { x: 0, y: 0 };
   }
 

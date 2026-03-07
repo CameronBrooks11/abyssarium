@@ -7,7 +7,6 @@
  *  take effect on the same physics tick. */
 
 import type { Tank } from '@/tank/Tank';
-import { nextId } from '@/types/entities';
 import type { TankEvent, TankEventPayload, CatastropheKind } from '@/types/entities';
 import type { Vec2 } from '@/utils/vec2';
 
@@ -42,12 +41,9 @@ export class InputSystem {
 
   /** Drain the queue, emitting each pending action as a TankEvent. */
   flush(tank: Tank): void {
-    const now = tank.time;
     for (const payload of this.queue) {
       const event: TankEvent = {
-        id: nextId('ev'),
         type: payload.type,
-        timestamp: now,
         payload,
       };
       tank.events.emit(event);

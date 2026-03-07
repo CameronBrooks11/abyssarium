@@ -14,6 +14,7 @@ import { FluidGrid, defaultFluidConfig } from '@/tank/Fluid';
 import { SpatialHash } from '@/utils/spatialHash';
 import { EventBus } from '@/types/events';
 import type { TankEvent } from '@/types/entities';
+import { CreatureLifeState } from '@/types/entities';
 import type { Creature } from '@/creatures/Creature';
 import type { Particle } from '@/particles/Particle';
 
@@ -92,7 +93,7 @@ export class Tank {
    * Called once per frame after the physics pass completes.
    */
   prune(): void {
-    this.creatures = this.creatures.filter(c => c.lifeState !== 'dead');
+    this.creatures = this.creatures.filter(c => c.lifeState !== CreatureLifeState.Dead);
     this.particles = this.particles.filter(p => p.life > 0);
   }
 

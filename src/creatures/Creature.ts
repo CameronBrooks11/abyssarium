@@ -14,6 +14,8 @@ export interface CreatureSpec {
   species: string;
   position: Vec2;
   traits: CreatureTraits;
+  angle?: number;
+  animPhase?: number;
 }
 
 export class Creature {
@@ -53,15 +55,6 @@ export class Creature {
   wanderAngle: number = 0;
 
   /**
-   * ID of the food particle currently being pursued, or null.
-   * Set by BehaviorSystem; cleared when food is consumed or out of range.
-   */
-  targetFoodId: string | null = null;
-
-  /** ID of the predator/threat currently being fled, or null. */
-  threatId: string | null = null;
-
-  /**
    * Glow intensity [0, 1]. Normally equals traits.glow, but spikes on
    * light pulse (photophilic) or drops (photophobic).
    */
@@ -80,11 +73,6 @@ export class Creature {
    */
   segments: Vec2[];
 
-  // ── Boids / flocking ──────────────────────────────────────────────────────
-  /** Rolling average of nearby same-species positions — used for cohesion. */
-  flockCenter: Vec2 = vec2Zero();
-  flockCount: number = 0;
-
   constructor(spec: CreatureSpec) {
     this.id = spec.id;
     this.species = spec.species;
@@ -94,7 +82,7 @@ export class Creature {
       position: vec2Clone(spec.position),
       velocity: vec2Zero(),
       acceleration: vec2Zero(),
-      angle: Math.random() * Math.PI * 2,
+      angle: spec.angle ?? Math.random() * Math.PI * 2,
       angularVel: 0,
       mass: 0.5 + spec.traits.scale * 1.5,
       drag: 0.04 + (1 / spec.traits.speed) * 0.02,
@@ -103,7 +91,7 @@ export class Creature {
 
     this.prevPosition = vec2Clone(spec.position);
     this.glowIntensity = spec.traits.glow;
-    this.animPhase = Math.random() * Math.PI * 2;
+    this.animPhase = spec.animPhase ?? Math.random() * Math.PI * 2;
 
     this.segments = Array.from({ length: spec.traits.segmentCount }, () =>
       vec2Clone(spec.position),

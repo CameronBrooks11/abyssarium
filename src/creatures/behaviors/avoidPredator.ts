@@ -40,11 +40,9 @@ export const computeAvoidPredator = (creature: Creature, tank: Tank): Vec2 => {
   }
 
   if (closestThreat === null) {
-    creature.threatId = null;
     return { x: 0, y: 0 };
   }
 
-  creature.threatId = closestThreat.id;
   return flee(
     creature.body,
     closestThreat.body.position,
