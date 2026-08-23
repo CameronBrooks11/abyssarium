@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
+
+  # package-lock.json is committed, so the lock is what moves. Grouped by
+  # dependency type: a dev-only bump and a runtime bump carry different risk
+  # and should not ride in on the same PR.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: build
+    groups:
+      production:
+        dependency-type: production
+      development:
+        dependency-type: development
